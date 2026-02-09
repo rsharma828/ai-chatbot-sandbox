@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scelify | AI Customer Support</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                        body: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        obsidian: '#0B0C10',
+                        charcoal: '#1F2833',
+                        emerald: {
+                            glow: '#66FCF1',
+                            dim: '#45A29E',
+                        },
+                        violet: {
+                            haze: '#8B5CF6',
+                            deep: '#4C1D95',
+                        },
+                        glass: {
+                            surface: 'rgba(255, 255, 255, 0.03)',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            highlight: 'rgba(255, 255, 255, 0.1)',
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #45A29E 0deg, #66FCF1 180deg, #8B5CF6 360deg)',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #050505;
+            color: #E2E8F0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .chat-frame {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            border: none;
+            z-index: 9999;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.4));
+            border-radius: 12px;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(102, 252, 241, 0.3);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(102, 252, 241, 0.1);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 20px rgba(102, 252, 241, 0.3);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0B0C10;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1F2833;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #45A29E;
+        }
+    </style>
+</head>
+
+<body
+    class="relative h-screen w-screen overflow-hidden selection:bg-emerald-glow selection:text-obsidian flex flex-col">
+
+    <!-- Background Effects -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div
+            class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[120px] animate-blob">
+        </div>
+        <div
+            class="absolute top-[20%] right-1/4 w-[400px] h-[400px] bg-emerald-glow/10 rounded-full blur-[100px] animate-blob animation-delay-2000">
+        </div>
+        <div
+            class="absolute bottom-0 left-1/3 w-[600px] h-[600px] bg-violet-haze/10 rounded-full blur-[120px] animate-blob animation-delay-4000">
+        </div>
+        <!-- Grid Pattern Overlay -->
+        <div
+            class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-150 contrast-150 mix-blend-overlay">
+        </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="z-[100] w-full glass-panel border-b-0 border-white/5 shrink-0">
+        <div class="container mx-auto px-6 h-14 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-1.5 h-6 bg-gradient-to-b from-emerald-glow to-violet-haze rounded-full"></div>
+                <span class="font-display font-bold text-lg tracking-tight text-white/90">
+                    Scelify <span class="text-emerald-glow font-light opacity-60">Sandbox</span>
+                </span>
+                <span
+                    class="ml-2 px-2 py-0.5 text-[10px] font-mono tracking-wider uppercase text-emerald-glow/80 bg-emerald-glow/10 border border-emerald-glow/20 rounded-md">
+                    v2.0 Beta
+                </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="relative group">
+                    <div
+                        class="absolute -inset-0.5 bg-gradient-to-r from-emerald-glow to-violet-haze rounded-lg blur opacity-20 group-hover:opacity-60 transition duration-500">
+                    </div>
+                    <input type="text" id="companyIdInput" placeholder="Enter Company ID..."
+                        class="relative bg-obsidian/80 border border-white/10 text-white placeholder-white/30 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-glow/50 focus:ring-1 focus:ring-emerald-glow/50 w-48 transition-all" />
+                </div>
+                <button onclick="renderChatbot()"
+                    class="relative px-4 py-1.5 group bg-white text-obsidian text-xs font-bold rounded-lg overflow-hidden transition-all hover:scale-105 active:scale-95">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-emerald-glow via-white to-violet-haze opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    </div>
+                    <span class="relative z-10 group-hover:text-black transition-colors">Launch Bot</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex-1 flex flex-col justify-between container mx-auto px-6 max-h-screen">
+
+        <!-- Navigation Mockup -->
+        <nav class="py-4 shrink-0">
+            <div class="flex items-center justify-between glass-panel rounded-full px-6 py-3 w-full max-w-4xl mx-auto">
+                <div class="font-display font-bold text-base tracking-tight text-white">HostBrand<span
+                        class="text-emerald-glow">.io</span></div>
+                <div class="hidden md:flex gap-6 text-xs font-medium text-white/60">
+                    <a href="#" class="hover:text-emerald-glow transition-colors">Platform</a>
+                    <a href="#" class="hover:text-emerald-glow transition-colors">Solutions</a>
+                    <a href="#" class="hover:text-emerald-glow transition-colors">Developers</a>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-xs text-white/50">System Online</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="flex flex-col items-center justify-center text-center flex-1 -mt-8">
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm text-xs font-medium text-emerald-glow mb-6 animate-float">
+                <span class="relative flex h-1.5 w-1.5">
+                    <span
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-glow opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-glow"></span>
+                </span>
+                Live Demo Environment
+            </div>
+
+            <h1
+                class="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.1] mb-6">
+                Redefine Support with <br />
+                <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-glow via-white to-emerald-glow bg-[length:200%_auto] animate-gradient">Scelify
+                    AI</span>
+            </h1>
+
+            <p class="text-base md:text-lg text-white/50 max-w-xl mx-auto leading-relaxed mb-8">
+                Experience ultra-low latency conversational AI. Input your ID above to verify your Scelify configuration
+                instantly.
+            </p>
+
+            <div class="flex flex-row items-center justify-center gap-4">
+                <button
+                    class="px-6 py-3 bg-emerald-glow text-obsidian font-display font-bold rounded-xl hover:bg-emerald-300 transition-colors shadow-[0_0_20px_-5px_rgba(102,252,241,0.4)] text-sm">
+                    Start Integration
+                </button>
+                <button
+                    class="px-6 py-3 glass-card text-white font-medium rounded-xl hover:bg-white/5 transition-colors group text-sm">
+                    Docs <span class="inline-block transform group-hover:translate-x-1 transition-transform">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Features Grid -->
+        <section class="pb-8 shrink-0">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
+                <!-- Card 1 -->
+                <div class="glass-card p-4 rounded-2xl flex items-center gap-4 group">
+                    <div
+                        class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-emerald-glow border border-white/10 group-hover:scale-105 transition-transform shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-semibold text-sm text-white">Instant Latency</h3>
+                        <p class="text-xs text-white/40">Responses in < 100ms</p>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-card p-4 rounded-2xl flex items-center gap-4 group">
+                    <div
+                        class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-violet-400 border border-white/10 group-hover:scale-105 transition-transform shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5 10 10 0 0 0-10 0 4 4 0 0 1-5 5 4 4 0 0 1-5 5">
+                            </path>
+                            <path d="M8.5 8.5C7 9.5 6 11 6 12.5a3.5 3.5 0 0 0 3.5 3.5c1.5 0 3-1 3.5-2.5"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-semibold text-sm text-white">Neural Context</h3>
+                        <p class="text-xs text-white/40">Remembers interactions</p>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-card p-4 rounded-2xl flex items-center gap-4 group">
+                    <div
+                        class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-blue-400 border border-white/10 group-hover:scale-105 transition-transform shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-semibold text-sm text-white">Omnichannel</h3>
+                        <p class="text-xs text-white/40">Web, Mobile, & Social</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-6">
+                <p class="text-white/20 text-[10px]">© 2024 Scelify Inc. All rights reserved.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // CONFIGURATION
+        const BASE_URL = "http://localhost:3000";
+
+        let iframeElement = null;
+
+        function renderChatbot() {
+            const companyId = document.getElementById('companyIdInput').value;
+
+            if (!companyId) {
+                // Custom toast or alert could be better, but basic alert works for sandbox
+                alert("Please enter a Company ID");
+                return;
+            }
+
+            // Remove existing iframe if present
+            if (iframeElement) {
+                iframeElement.remove();
+            }
+
+            // Create new iframe
+            iframeElement = document.createElement("iframe");
+            iframeElement.src = `${BASE_URL}/chatbot?id=${companyId}`;
+            iframeElement.classList.add("chat-frame");
+
+            // Initial dimensions (collapsed)
+            iframeElement.width = "400px";
+            iframeElement.height = "100px";
+
+            document.body.appendChild(iframeElement);
+
+            // Send ID after load (just in case postMessage is needed for initialization)
+            iframeElement.onload = () => {
+                setTimeout(() => {
+                    iframeElement.contentWindow.postMessage(companyId, BASE_URL);
+                }, 1000);
+            };
+        }
+
+        // Listen for resize messages from the chatbot
+        window.addEventListener("message", (e) => {
+            if (e.origin !== BASE_URL) return;
+
+            try {
+                let dimensions;
+                if (typeof e.data === 'string') {
+                    dimensions = JSON.parse(e.data);
+                } else if (typeof e.data === 'object' && e.data !== null) {
+                    dimensions = e.data;
+                } else {
+                    return;
+                }
+
+                if (iframeElement && dimensions.width && dimensions.height) {
+                    iframeElement.width = dimensions.width;
+                    iframeElement.height = dimensions.height;
+                }
+            } catch (err) {
+                // Silent catch
+                console.warn("Resize error", err);
+            }
+        });
+    </script>
+</body>
+
+</html>
